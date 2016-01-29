@@ -22,4 +22,5 @@ urlpatterns = [
     #blog
     url(r'^blog/', include('blog.urls')),
     url(r'^accounts/', include('django.contrib.auth.urls'))
+
 ]

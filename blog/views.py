@@ -1,14 +1,15 @@
 #coding=utf-8
+from django.contrib.auth import authenticate, login
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import F
 from django.views.generic.list import ListView
 from models import Article
-from forms import ArticlePublishForm
+from forms import ArticlePublishForm,RegisterForm
 from django.views.generic.edit import FormView
 from django.views.generic.detail import DetailView
 from django.http import Http404
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.core.paginator import PageNotAnInteger,EmptyPage,Paginator
 from django.contrib.admin.views.decorators import staff_member_required
 # Create your views here.
@@ -94,3 +95,15 @@ class ArticleEditView(AdminRequiredMixin,FormView):
         success_url = reverse('article_detail', args=(title,))
         return success_url
 
+class RegisterView(FormView):
+    template_name = 'register.html'
+    form_class = RegisterForm
+    success_url = reverse_lazy('blog_index')
+
+    def form_valid(self, form):
+        form.save()
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+        user = authenticate(username=username, password=password)
+        login(self.request, user)
+        return super(RegisterView, self).form_valid(form)
